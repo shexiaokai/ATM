@@ -9,6 +9,8 @@ private:
 	string card_num;
 	string password;
 	string name;
+	string IDcard_num;
+	int money;
 
 public:
 	Card();

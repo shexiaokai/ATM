@@ -7,6 +7,7 @@ const string APPLY_TEXT[4]={
 	"请确定您的密码：",
 };
 
+
 ATM::ATM(void)
 {
 	;
@@ -42,7 +43,7 @@ void ATM::ApplyBankCard()
 	Gotoxy(12,9);
 	cout<<"_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _";
 	Gotoxy(12,9);
-	pcard->card_num=GetIDNum();
+	pcard->IDcard_num=GetIDNum();
 	while(!password_same)
 	{
 		Gotoxy(12,12);
@@ -61,7 +62,7 @@ void ATM::ApplyBankCard()
 		else
 			MessageBox( NULL , TEXT("两次密码不一致！") , TEXT("错误！") , MB_ICONINFORMATION);
 	}
-	
+	pcard->card_num=MakeCardNum();
 	SaveCardMessage(pcard);
 	delete pcard;
 	pcard=NULL;
@@ -115,6 +116,37 @@ string ATM::GetIDNum()		const
 	return idNum;
 }
 
+string ATM::GetCardNum()		const
+{
+	string CardNum(17,0);
+	char ch;
+	int i=0;
+	while(1)
+	{
+		ch=_getch();
+		if(ch==13&&i==16)
+		{
+			break;
+		}
+		else if(ch>='0'&&ch<='9'&&i<16)
+		{
+			if(i==15)
+				cout<<ch;
+			else
+				cout<<ch<<" ";
+			CardNum[i]=ch;
+			i++;
+		}
+		else if(ch==8&&i>0)
+		{
+			cout<<"\b\b_\b";
+			CardNum[i]=0;
+			i--;
+		}
+	}
+	return CardNum;
+}
+
 string ATM::GetPassword()	const
 {
 	string password(7,0);
@@ -146,14 +178,106 @@ string ATM::GetPassword()	const
 	return password;
 }
 
+string ATM::MakeCardNum()				const
+{
+	char num[5]={0};
+	string str;
+	srand((U8)time(0));
+	for(int i=0;i<4;i++)
+	{
+		sprintf(num,"%04d",rand()%10000);
+		str+=num;
+	}
+	return str; 
+}
+
 void ATM::SaveCardMessage(Card *pcard)	const
 {
 	fstream file;
+	
 	file.open("Document\\CardList.txt",ios::app);
 	file<<"*"<<pcard->card_num<<endl;
 	file<<pcard->password<<endl;
 	file<<pcard->name<<endl;
+	file<<pcard->IDcard_num<<endl<<'#'<<endl<<endl;
 	file.close();
+}
 
+void ATM::OperatingBankCard()
+{
+	bool back=false;
+	Card* pcard=new Card;
+	do
+	{
+		system("cls");
+		Gotoxy(12,8);
+		cout<<"请输入您的卡号：";
+		Gotoxy(12,9);
+		cout<<"_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _";
+		Gotoxy(12,9);
+		pcard->card_num=GetCardNum();
+	}while(!SearchCard(pcard));
+	delete pcard;
+	
+	while(!back)
+		switch(OperatingSelect())
+		{
+			case 1://SaveMoney();break;
+			case 5:back=true;break;
+		}
+}
+
+int ATM::OperatingSelect()	const
+{
+	int choose;
+	RECT *a=new RECT;
+	a->left=0;
+	a->right=60;
+	a->top=0;
+	a->bottom=25;
+	system("cls");
+	Menu *pmenu1=new Menu(5,MENU_TEXT2,*a,2);
+	delete a;
+	a=NULL;
+	assert(a==NULL);
+	choose=pmenu1->MenuSelect();
+	delete pmenu1;
+	pmenu1=NULL;
+	assert(pmenu1==NULL);
+	assert(choose>0&&choose<=5);
+	return choose;
+}
+
+bool ATM::SearchCard(Card* pcard)
+{
+	bool search =false;
+	char ch;
+	fstream file;
+	file.open("Document\\CardList.txt");
+	while(!search)
+	{
+		if(!file.get(ch))
+			break;
+		else if(ch=='*')
+		{
+			string str(17,0);
+			for(int i=0;i<16;i++)
+			{
+				file.get(ch);
+				str[i]=ch;
+			}
+			if(str==pcard->card_num)
+				search=true;
+		}
+	}
+	if(!search)
+	{
+		MessageBox( NULL , TEXT("查无此卡") , TEXT("错误！") , MB_ICONINFORMATION);
+	}
+	else
+	{
+		file.get(ch);
+	}
+	return search;
 
 }

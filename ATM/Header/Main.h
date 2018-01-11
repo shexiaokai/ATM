@@ -10,6 +10,7 @@ using namespace std;
 #include <conio.h>
 #include <string>
 #include <windows.h>
+#include <time.h>
 #include "Cursor.h"
 #include "Menu.h"
 #include "ATM.h"
@@ -22,5 +23,6 @@ using namespace std;
 #define U32	unsigned int	
 
 extern const string MENU_TEXT1[3];
+extern const string MENU_TEXT2[5];
 
 void Initial(void);

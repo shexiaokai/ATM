@@ -45,3 +45,6 @@
 *.idb
 *.pdb
 *.ipch
+ATM.opensdf
+*.suo
+*.unsuccessfulbuild
