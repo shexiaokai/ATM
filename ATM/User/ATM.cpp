@@ -36,7 +36,7 @@ int ATM::Welcome()
 void ATM::ApplyBankCard()
 {
 	bool password_same=false;
-	Card *pcard=new Card;
+	pcard=new Card;
 	ApplyInterface();
 	Gotoxy(12,6);
 	cin>>pcard->name;
@@ -58,15 +58,20 @@ void ATM::ApplyBankCard()
 		{
 			password_same=true;
 			pcard->password=ps1;
+
 		}
 		else
 			MessageBox( NULL , TEXT("两次密码不一致！") , TEXT("错误！") , MB_ICONINFORMATION);
 	}
 	pcard->card_num=MakeCardNum();
-	SaveCardMessage(pcard);
+	system("cls");
+	cout<<"\n\n\n\t\t申请成功！\n\n\t\t您的卡号为:\n\n\t\t"\
+		<<pcard->card_num<<"\n\n\t\t";
+	SaveCardMessage();
 	delete pcard;
 	pcard=NULL;
 	assert(pcard==NULL);
+	system("pause");
 }
 
 void ATM::ApplyInterface()	const
@@ -191,7 +196,7 @@ string ATM::MakeCardNum()				const
 	return str; 
 }
 
-void ATM::SaveCardMessage(Card *pcard)	const
+void ATM::SaveCardMessage()	const
 {
 	fstream file;
 	
@@ -199,14 +204,15 @@ void ATM::SaveCardMessage(Card *pcard)	const
 	file<<"*"<<pcard->card_num<<endl;
 	file<<pcard->password<<endl;
 	file<<pcard->name<<endl;
-	file<<pcard->IDcard_num<<endl<<'#'<<endl<<endl;
+	file<<pcard->IDcard_num<<endl;
+	file<<"0"<<endl<<'#'<<endl<<endl;
 	file.close();
 }
 
 void ATM::OperatingBankCard()
 {
 	bool back=false;
-	Card* pcard=new Card;
+	pcard=new Card;
 	do
 	{
 		system("cls");
@@ -216,15 +222,16 @@ void ATM::OperatingBankCard()
 		cout<<"_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _";
 		Gotoxy(12,9);
 		pcard->card_num=GetCardNum();
-	}while(!SearchCard(pcard));
-	delete pcard;
-	
+	}while(!SearchCard());
+
 	while(!back)
 		switch(OperatingSelect())
 		{
-			case 1://SaveMoney();break;
+			case 1:SaveMoney();break;
 			case 5:back=true;break;
 		}
+	delete pcard;
+	pcard=NULL;
 }
 
 int ATM::OperatingSelect()	const
@@ -248,7 +255,7 @@ int ATM::OperatingSelect()	const
 	return choose;
 }
 
-bool ATM::SearchCard(Card* pcard)
+bool ATM::SearchCard()
 {
 	bool search =false;
 	char ch;
@@ -277,7 +284,46 @@ bool ATM::SearchCard(Card* pcard)
 	else
 	{
 		file.get(ch);
+		file>>pcard->password;
+		file>>pcard->name;
+		file>>pcard->IDcard_num;
+		file>>pcard->money;
 	}
+	file.close();
 	return search;
 
+}
+
+void ATM::SaveMoney()
+{
+	int m=0;
+	system("cls");
+	cout<<"\n\n\n\t\t请输入您要存入的金额：\n\n\t\t";
+	cin>>m;
+	cout<<"\n\n\t\t您已存入"<<m<<"元人民币"<<"\n\n\t\t";
+	system("pause");
+	pcard->money+=m;
+
+	time_t t = time(0); 
+    char tmp[33]={NULL};
+    strftime(tmp, sizeof(tmp), "%Y-%m-%d %H:%M:%S",localtime(&t)); 
+	char num[10]={NULL};
+	sprintf(num,"%d",m);
+	string str=tmp;
+	str+="  ";
+	str+="存入";
+	str+=num;
+	str+="元";
+	AddMessage(str);
+
+}
+
+void ATM::AddMessage(string str1)	const
+{
+	char ch;
+	fstream file;
+	file.open("Document\\DataList.txt",ios::app);
+	file<<"*"<<pcard->card_num<<endl;
+	file<<str1<<endl;
+	file.close();
 }

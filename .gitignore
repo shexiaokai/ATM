@@ -48,3 +48,7 @@
 ATM.opensdf
 *.suo
 *.unsuccessfulbuild
+*.uml
+*.classdiagram
+*.layout
+*.modelproj
