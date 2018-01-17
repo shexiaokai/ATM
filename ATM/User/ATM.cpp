@@ -154,7 +154,7 @@ string ATM::GetCardNum()		const
 
 string ATM::GetPassword()	const
 {
-	string password(7,0);
+	string password(6,0);
 	char ch;
 	int i=0;
 	while(1)
@@ -223,11 +223,22 @@ void ATM::OperatingBankCard()
 		Gotoxy(12,9);
 		pcard->card_num=GetCardNum();
 	}while(!SearchCard());
-
+	while(1)
+	{
+		system("cls");
+		Gotoxy(12,8);
+		cout<<"请输入您的密码：";
+		Gotoxy(12,9);
+		cout<<"_ _ _ _ _ _";
+		Gotoxy(12,9);
+		if(pcard->password==GetPassword())
+			break;
+	}
 	while(!back)
 		switch(OperatingSelect())
 		{
 			case 1:SaveMoney();break;
+			case 2:WithdarwMoney();break;
 			case 5:back=true;break;
 		}
 	delete pcard;
@@ -307,15 +318,51 @@ void ATM::SaveMoney()
 	time_t t = time(0); 
     char tmp[33]={NULL};
     strftime(tmp, sizeof(tmp), "%Y-%m-%d %H:%M:%S",localtime(&t)); 
-	char num[10]={NULL};
-	sprintf(num,"%d",m);
+	char num[15]={NULL};
+	sprintf(num,"%10d",m);
 	string str=tmp;
 	str+="  ";
 	str+="存入";
 	str+=num;
 	str+="元";
+	str+="\t\t余额：";
+	sprintf(num,"%d",pcard->money);
+	str+=num;
 	AddMessage(str);
+	ChangeMoney();
 
+}
+void ATM::WithdarwMoney()
+{
+	int m=0;
+	loop:
+	system("cls");
+	cout<<"\n\n\n\t\t请输入您要提取的金额：\n\n\t\t";
+	cin>>m;
+	if(m>pcard->money)
+	{
+		MessageBox( NULL , TEXT("您的余额不足！") , TEXT("错误！") , MB_ICONINFORMATION);
+		goto loop;
+	}
+	pcard->money-=m;
+	cout<<"\n\n\t\t您已提取"<<m<<"元人民币，账户余额："<<pcard->money<<"\n\n\t\t";
+	system("pause");
+
+	time_t t = time(0); 
+    char tmp[33]={NULL};
+    strftime(tmp, sizeof(tmp), "%Y-%m-%d %H:%M:%S",localtime(&t)); 
+	char num[15]={NULL};
+	sprintf(num,"%10d",m);
+	string str=tmp;
+	str+="  ";
+	str+="提取";
+	str+=num;
+	str+="元";
+	str+="\t\t余额：";
+	sprintf(num,"%d",pcard->money);
+	str+=num;
+	AddMessage(str);
+	ChangeMoney();
 }
 
 void ATM::AddMessage(string str1)	const
@@ -325,5 +372,38 @@ void ATM::AddMessage(string str1)	const
 	file.open("Document\\DataList.txt",ios::app);
 	file<<"*"<<pcard->card_num<<endl;
 	file<<str1<<endl;
+	file.close();
+}
+
+void ATM::ChangeMoney()	const
+{
+	char ch;
+	fstream file;
+	file.open("Document\\CardList.txt",ios::in|ios::out);
+	while(1)
+	{
+		if(!file.get(ch))
+			break;
+		else if(ch=='*')
+		{
+			string str(17,0);
+			for(int i=0;i<16;i++)
+			{
+				file.get(ch);
+				str[i]=ch;
+			}
+			if(str==pcard->card_num)
+				break;
+		}
+	}
+	file.get(ch);
+	string a;
+	for(int i=3;i;i--)
+		file>>a;
+	file.seekg(1,ios::cur);
+	char num[20]={NULL};
+	sprintf(num,"%d",pcard->money);
+	string str=num;
+	file<<str;
 	file.close();
 }

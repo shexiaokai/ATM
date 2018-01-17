@@ -13,10 +13,12 @@ private:
 	string GetPassword()		const;
 	string MakeCardNum()		const;
 	void SaveMoney();
+	void WithdarwMoney();
 	void SaveCardMessage()		const;
 	int OperatingSelect()		const;		
 	bool SearchCard();
 	void AddMessage(string)		const;
+	void ChangeMoney()			const;
 
 public:
 	ATM(void);

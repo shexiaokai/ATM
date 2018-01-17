@@ -19,14 +19,6 @@ int main()
 {
 	ATM atm;
 	Initial();
-	time_t t = time(0); 
-    char tmp[32]={NULL};
-    strftime(tmp, sizeof(tmp), "%Y-%m-%d %H:%M:%S",localtime(&t)); 
-    cout<<tmp<<endl;
-	_getch();
-	//Gotoxy(10, 10);
-	//SetConsoleDisplayMode(GetStdHandle(STD_OUTPUT_HANDLE),);
-	//int result = MessageBox( NULL , TEXT("这是对话框") , TEXT("你好") , MB_ICONINFORMATION|MB_YESNO);
 	while(1)
 	{
 		switch(atm.Welcome()){

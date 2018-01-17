@@ -52,3 +52,5 @@ ATM.opensdf
 *.classdiagram
 *.layout
 *.modelproj
+Debug/Document/CardList.txt
+Debug/Document/DataList.txt
